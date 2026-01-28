@@ -154,7 +154,7 @@ router.get('/editinvoice/:id', async (req, res) => {
 
 // update with Id
 
-router.put('updateinvoice/:id',async(req,res)=>{
+router.put('/updateinvoice/:id',async(req,res)=>{
   console.log("updateInvoice")
   try{
     const updateInvoice=await Invoice.findByIdAndUpdate({_id:req.params.id},{$set:req.body},{new:true,runValidators:true})

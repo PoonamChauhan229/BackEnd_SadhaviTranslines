@@ -3,17 +3,18 @@ const app = express();
 const cors = require('cors');
 
 const dotenv = require('dotenv');
-const connection = require('./db/connection');
+
 
 dotenv.config();
 app.use(express.json());
+const connection = require('./db/connection');
 
 
 
 // Enable CORS for all routes
 app.use(cors({
     //origin: 'http://localhost:3000', // Replace with your frontend URL
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST','PUT','DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }));
 
