@@ -154,16 +154,47 @@ router.get('/editinvoice/:id', async (req, res) => {
 
 // update with Id
 
-router.put('/updateinvoice/:id',async(req,res)=>{
-  console.log("updateInvoice")
-  try{
-    const updateInvoice=await Invoice.findByIdAndUpdate({_id:req.params.id},{$set:req.body},{new:true,runValidators:true})
-    console.log(updateInvoice)
-   res.send(updateInvoice)
-  }catch(e){
-    console.log(e)
+router.put('/updateinvoice/:id', async (req, res) => {
+  try {
+    const { address } = req.body;
+
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice) {
+      return res.status(404).send({ message: "Invoice not found" });
+    }
+
+    /* -------- Auto-update clientName ONLY -------- */
+
+    if (address) {
+      const clients = await Client.find({}, { name: 1, _id: 0 });
+      const names = clients.map(c => c.name.toLowerCase());
+
+      const match = names.find(name =>
+        name.includes(address.substring(0, 5).toLowerCase())
+      );
+
+      if (match) {
+        invoice.clientName = match
+          .split(" ")
+          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ");
+      }
+    }
+
+    /* -------- Update remaining fields -------- */
+
+    Object.keys(req.body).forEach(key => {
+      invoice[key] = req.body[key];
+    });
+
+    await invoice.save();
+    res.send(invoice);
+
+  } catch (e) {
+    res.status(400).send({ message: e.message });
   }
-})
+});
+
 
 // delete 
 router.delete('/deleteInvoice/:id',async(req,res)=>{
