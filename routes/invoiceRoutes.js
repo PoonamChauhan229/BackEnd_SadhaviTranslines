@@ -164,4 +164,19 @@ router.put('/updateinvoice/:id',async(req,res)=>{
     console.log(e)
   }
 })
+
+// delete 
+router.delete('/deleteInvoice/:id',async(req,res)=>{
+    console.log("deleteInvoice")
+    try{
+    const deleteInvoice=await Invoice.findByIdAndDelete({_id:req.params.id})
+    console.log(deleteInvoice)
+   res.send(deleteInvoice)
+  }catch(e){
+    console.log(e)
+  }
+
+
+
+})
 module.exports = router;
