@@ -17,6 +17,7 @@
     "docxtemplater": "^3.49.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "jimp": "^0.16.1",
     "js-file-download": "^0.4.12",
     "mongoose": "^8.5.1",
     "nodemon": "^3.1.4",

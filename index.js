@@ -28,6 +28,8 @@ app.use(goodsRouter)
 const invoiceRouter=require('./routes/invoiceRoutes')
 app.use(invoiceRouter)
 
+const lrRouter=require('./routes/lrRoutes')
+app.use(lrRouter)
 const PORT = process.env.PORT || 8000;
 
 // Db connection
