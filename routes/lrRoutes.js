@@ -12,27 +12,103 @@ const templates = {
 };
 
 // Helper function to generate LR image as Jimp object
+
+// Helper function to print bold text
+// function printBold(image, font, text, x, y) {
+//   const offsets = [
+//     [0,0],
+//     [1,0],
+//     [0,1],
+//     [1,1],
+//   ];
+//   offsets.forEach(([dx, dy]) => {
+//     image.print(font, x + dx, y + dy, text);
+//   });
+// }
+
+// async function generateLRJimp(lrData, templateFile) {
+//   const imagePath = path.join(process.cwd(), 'assets', templateFile);
+//   const image = await Jimp.read(imagePath);
+//   const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+//   const fontdate = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK);
+
+//   /// Top-right LR info
+//   image.print(font, 2950, 880, lrData.lrNo);
+
+//   // ✅ Fake bold for date and vehicle
+//   printBold(image, fontdate, lrData.lrDate, 2800, 1100);
+//   printBold(image, fontdate, lrData.lrVehicleNo, 2930, 1300);
+
+//   image.print(fontdate, 2800, 1500, lrData.startPoint);
+//   image.print(fontdate, 2800, 1650, lrData.destination);
+
+//   // Middle-left Consignee
+//   image.print(fontdate, 900, 1360, lrData.consigneeName );
+//   image.print(fontdate, 200, 1460,  lrData.consigneeAddress.slice(0,70));
+//   image.print(fontdate, 500, 1560,  lrData.consigneeAddress.slice(70));
+
+//   // Table description / weight
+//   image.print(fontdate, 1200, 2000, lrData.description);
+//   image.print(fontdate, 2400, 2100, lrData.weight);
+
+//   return image;
+// }
+
+// ------------------ JIMP HELPERS ------------------
+
+// Print bold text (3x3 grid for extra bold)
+function printExtraBold(image, font, text, x, y) {
+  const offsets = [
+    [0,0],[1,0],[2,0],
+    [0,1],[1,1],[2,1],
+    [0,2],[1,2],[2,2]
+  ];
+  offsets.forEach(([dx, dy]) => {
+    image.print(font, x + dx, y + dy, text);
+  });
+}
+
+// ------------------ GENERATE LR IMAGE ------------------
 async function generateLRJimp(lrData, templateFile) {
   const imagePath = path.join(process.cwd(), 'assets', templateFile);
   const image = await Jimp.read(imagePath);
-  const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+
+  const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);  // for LR number
+  const fontdate = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK); // for other fields
 
   /// Top-right LR info
-image.print(font, 2800, 900, lrData.lrNo);
-image.print(font, 900, 160, lrData.lrDate);
-image.print(font, 900, 200, lrData.lrVehicleNo);
-image.print(font, 900, 240, lrData.startPoint);
-image.print(font, 900, 280, lrData.destination);
+  // image.print(font, 2950, 880, lrData.lrNo); // LR number left normal
+    printExtraBold(image, font, lrData.lrNo, 2950, 880);
 
-// Middle-left Consignee
-image.print(font, 200, 350, lrData.consigneeName + ', ' + lrData.consigneeAddress);
 
-// Table description / weight
-image.print(font, 200, 400, lrData.description);
-image.print(font, 800, 400, lrData.weight);
+  // Extra bold for key fields
+  printExtraBold(image, fontdate, lrData.lrDate, 2800, 1100);
+  printExtraBold(image, fontdate, lrData.lrVehicleNo, 2930, 1300);
+  printExtraBold(image, fontdate, lrData.startPoint, 2800, 1500);
+  printExtraBold(image, fontdate, lrData.destination, 2800, 1650);
+
+  // Middle-left Consignee
+  printExtraBold(image, fontdate, lrData.consigneeName, 900, 1360);
+  printExtraBold(image, fontdate, lrData.consigneeAddress.slice(0,70), 200, 1460);
+  printExtraBold(image, fontdate, lrData.consigneeAddress.slice(70), 500, 1560);
+
+  // Table description / weight
+  printExtraBold(image, fontdate, lrData.description, 1200, 2000);
+  printExtraBold(image, fontdate, lrData.weight, 2400, 2100);
+  image.quality(75);
+  image.resize(image.bitmap.width * 0.9, Jimp.AUTO);
+ 
 
   return image;
 }
+
+// Generate base64 of image
+async function generateLRBase64(lrData, templateFile) {
+  const image = await generateLRJimp(lrData, templateFile);
+  return await image.getBase64Async(Jimp.MIME_PNG);
+}
+
+
 
 // Helper function to get base64 of image
 async function generateLRBase64(lrData, templateFile) {
